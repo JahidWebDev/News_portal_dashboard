@@ -35,7 +35,7 @@ const Sidebar = () => {
         <li>
           <Link
             to="/dashboard/news"
-            className={`${pathname === "/dashboard/News" ? " bg-indigo-500 text-white" : " bg-white text-[#404040f6]"} px-3 py-2 w-full rounded-sm flex gap-x-2 items-center 
+            className={`${pathname === "/dashboard/news" ? " bg-indigo-500 text-white" : " bg-white text-[#404040f6]"} px-3 py-2 w-full rounded-sm flex gap-x-2 items-center 
                        hover:bg-indigo-500 hover:text-white 
                        hover:shadow-lg hover:shadow-indigo-500/20`}
           >
@@ -48,7 +48,7 @@ const Sidebar = () => {
         </li>
         <li>
           <Link
-            to="/dashboard/Writer/add"
+            to="/dashboard/writer/add"
             className={`${pathname === "/dashboard/Writer/add" ? " bg-indigo-500 text-white" : " bg-white text-[#404040f6]"} px-3 py-2 w-full rounded-sm flex gap-x-2 items-center 
                        hover:bg-indigo-500 hover:text-white 
                        hover:shadow-lg hover:shadow-indigo-500/20`}
