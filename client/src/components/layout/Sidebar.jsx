@@ -8,10 +8,10 @@ const Sidebar = () => {
   const { pathname } = useLocation();
 
   return (
-    <div className="w-[250px] h-screen fixed left-0 top-0 bg-white shadow-lg border-r flex flex-col">
+    <div className="w-[250px] h-screen fixed left-0 top-0 bg-white shadow-lg  flex flex-col">
 
       {/* Logo */}
-      <div className="h-[70px] flex justify-center items-center border-b">
+      <div className="h-[70px] flex justify-center items-center ">
         <Link to="/">
           <h1 className="text-lg font-bold tracking-wide text-indigo-600">
             Jonspondon News

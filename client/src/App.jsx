@@ -8,6 +8,9 @@ import Login from "./components/layout/pages/Login";
 import ProtectDashboard from "./middleware/ProtectDashboard";
 import ProtectRole from "./middleware/ProtectRole";
 import Unable from "./components/layout/pages/Unable";
+import AddWriter from "./components/layout/pages/AddWriter";
+import Writers from "./components/layout/pages/Writers";
+import News from "./components/layout/pages/News";
 
 function App() {
   return (
@@ -22,10 +25,13 @@ function App() {
             {/* default redirect */}
             <Route index element={<Navigate to="admin" replace />} />
             <Route path="unable-access" element={<Unable/>}/>
+            <Route path="news" element={<News/>}/>
 
             {/* Admin role protected route */}
             <Route element={<ProtectRole role="admin" />}>
               <Route path="admin" element={<AdminIndex />} />
+              <Route path="writer/add" element={<AddWriter />} />
+              <Route path="writers" element={<Writers />} />
             </Route>
           </Route>
         </Route>
