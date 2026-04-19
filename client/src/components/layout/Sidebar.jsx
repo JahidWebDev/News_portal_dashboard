@@ -3,10 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { AiFillDashboard, AiOutlinePlus } from "react-icons/ai";
 import { FiUsers } from "react-icons/fi";
 import { ImProfile } from "react-icons/im";
+import { FaPlus } from "react-icons/fa";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
-
+    const userInfo = {
+    role: "writer"
+  };
   return (
     <div className="w-[250px] h-screen fixed left-0 top-0 bg-white shadow-lg  flex flex-col">
 
@@ -21,8 +24,9 @@ const Sidebar = () => {
 
       {/* Menu */}
       <ul className="px-3 flex flex-col gap-y-2 font-medium mt-4">
-
-        <li>
+           {
+            userInfo.role === "admin" ? <> 
+            <li>
           <Link
             to="/dashboard/admin"
             className={`${pathname === "/dashboard/admin"
@@ -36,23 +40,6 @@ const Sidebar = () => {
               <AiFillDashboard />
             </span>
             <span>Dashboard</span>
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            to="/dashboard/news"
-            className={`${pathname === "/dashboard/news"
-              ? "bg-indigo-600 text-white shadow-md"
-              : "bg-white text-gray-700"
-            } px-3 py-2 w-full rounded-md flex gap-x-3 items-center
-            transition-all duration-200
-            hover:bg-indigo-600 hover:text-white hover:shadow-md`}
-          >
-            <span className="text-xl">
-              <AiFillDashboard />
-            </span>
-            <span>News</span>
           </Link>
         </li>
 
@@ -89,6 +76,60 @@ const Sidebar = () => {
             <span>Writers</span>
           </Link>
         </li>
+            </>:<>
+                  <li>
+          <Link
+            to="/dashboard/writer"
+            className={`${pathname === "/dashboard/writer"
+              ? "bg-indigo-600 text-white shadow-md"
+              : "bg-white text-gray-700"
+            } px-3 py-2 w-full rounded-md flex gap-x-3 items-center
+            transition-all duration-200
+            hover:bg-indigo-600 hover:text-white hover:shadow-md`}
+          >
+            <span className="text-xl">
+              <AiFillDashboard />
+            </span>
+            <span>Dashboard</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dashboard/news/create"
+            className={`${pathname === "/dashboard/news/create"
+              ? "bg-indigo-600 text-white shadow-md"
+              : "bg-white text-gray-700"
+            } px-3 py-2 w-full rounded-md flex gap-x-3 items-center
+            transition-all duration-200
+            hover:bg-indigo-600 hover:text-white hover:shadow-md`}
+          >
+            <span className="text-xl">
+              <FaPlus />
+            </span>
+            <span>Add News</span>
+          </Link>
+        </li>
+            </> 
+           }
+        
+
+        <li>
+          <Link
+            to="/dashboard/news"
+            className={`${pathname === "/dashboard/news"
+              ? "bg-indigo-600 text-white shadow-md"
+              : "bg-white text-gray-700"
+            } px-3 py-2 w-full rounded-md flex gap-x-3 items-center
+            transition-all duration-200
+            hover:bg-indigo-600 hover:text-white hover:shadow-md`}
+          >
+            <span className="text-xl">
+              <AiFillDashboard />
+            </span>
+            <span>News</span>
+          </Link>
+        </li>
+
 
         <li>
           <Link

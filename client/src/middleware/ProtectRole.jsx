@@ -3,7 +3,7 @@ import { Outlet, Navigate } from "react-router-dom";
 const ProtectRole = ({ role }) => {
   const user = {
     isAuth: true,
-    role: "admin",
+    role: "writer",
   };
 
   if (!user.isAuth) return <Navigate to="/login" />;

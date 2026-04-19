@@ -11,36 +11,64 @@ import Unable from "./components/layout/pages/Unable";
 import AddWriter from "./components/layout/pages/AddWriter";
 import Writers from "./components/layout/pages/Writers";
 import News from "./components/layout/pages/News";
+import Profile from "./components/layout/pages/Profile";
+import CreateNews from "./components/layout/pages/CreateNews";
+import { WriterIndex } from "./components/layout/pages/WriterIndex";
 
 function App() {
+  const userInfo = {
+    role: "writer"
+  };
+
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectDashboard />}>
           <Route path="/dashboard" element={<MainLayout />}>
-            {/* default redirect */}
-            <Route index element={<Navigate to="admin" replace />} />
-            <Route path="unable-access" element={<Unable/>}/>
-            <Route path="news" element={<News/>}/>
 
-            {/* Admin role protected route */}
+            {/* ✅ Role based redirect */}
+            <Route
+              index
+              element={
+                userInfo.role === "admin" ? (
+                  <Navigate to="admin" replace />
+                ) : (
+                  <Navigate to="writer" replace />
+                )
+              }
+            />
+
+            <Route path="unable-access" element={<Unable />} />
+            <Route path="news" element={<News />} />
+            <Route path="profile" element={<Profile />} />
+
+            {/* Admin Routes */}
             <Route element={<ProtectRole role="admin" />}>
               <Route path="admin" element={<AdminIndex />} />
               <Route path="writer/add" element={<AddWriter />} />
               <Route path="writers" element={<Writers />} />
             </Route>
+
+            {/* Writer Routes */}
+            <Route element={<ProtectRole role="writer" />}>
+              <Route path="writer" element={<WriterIndex />} />
+              <Route path="news/create" element={<CreateNews />} />
+            </Route>
+
           </Route>
         </Route>
 
         {/* Root redirect */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* 404 fallback (optional but recommended) */}
+        {/* 404 */}
         <Route path="*" element={<Navigate to="/login" replace />} />
+
       </Routes>
     </BrowserRouter>
   );

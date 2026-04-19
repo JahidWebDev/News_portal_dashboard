@@ -1,14 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 const NewsContent = () => {
   return (
     <div className="p-4 bg-gray-50 ">
-
       {/* Filter Section */}
       <div className="flex border-amber-50 flex-col md:flex-row items-center gap-4 mb-5 bg-white p-4 rounded-xl shadow-sm border">
-
         <select className="px-4 py-2 border border-gray-200 rounded-lg outline-none focus:border-green-500 text-sm w-full md:w-auto">
           <option value="">---select type---</option>
           <option value="pending">Pending</option>
@@ -21,16 +19,12 @@ const NewsContent = () => {
           placeholder="Search news..."
           className="px-4 py-2 rounded-lg outline-none border border-gray-200 focus:border-green-500 text-sm w-full md:w-[250px]"
         />
-
       </div>
 
       {/* Table */}
       <div className="bg-white  shadow-sm  overflow-hidden">
-
         <div className="overflow-x-auto">
-
           <table className="w-full text-sm text-left text-gray-600">
-
             <thead className="text-xs uppercase bg-gray-100 text-gray-500">
               <tr>
                 <th className="px-6 py-4">No</th>
@@ -45,9 +39,7 @@ const NewsContent = () => {
             </thead>
 
             <tbody>
-
               <tr className="border-b border-amber-50 hover:bg-gray-50 transition">
-
                 <td className="px-6 py-4">1</td>
 
                 <td className="px-6 py-4 font-medium text-gray-700">
@@ -68,9 +60,7 @@ const NewsContent = () => {
                   You all must have wa...
                 </td>
 
-                <td className="px-6 py-4 text-gray-400">
-                  April 18, 2026
-                </td>
+                <td className="px-6 py-4 text-gray-400">April 18, 2026</td>
 
                 <td className="px-6 py-4">
                   <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600 font-medium">
@@ -80,7 +70,6 @@ const NewsContent = () => {
 
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-center gap-2 text-base">
-
                     <Link
                       to="/view/1"
                       className="p-2 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition"
@@ -98,20 +87,45 @@ const NewsContent = () => {
                     <button className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition">
                       <FaTrash />
                     </button>
-
                   </div>
                 </td>
-
               </tr>
-
             </tbody>
-
           </table>
-
         </div>
-
       </div>
+     <div className="flex flex-col md:flex-row items-center justify-between px-5 py-4 mt-4 bg-white rounded-xl shadow-sm text-slate-600 gap-3">
 
+  {/* Left: Per Page */}
+  <div className="flex items-center gap-3">
+    <p className="text-sm font-medium">News per Page</p>
+    <select
+      className="px-3 py-2 rounded-lg outline-none border border-gray-200 focus:border-green-500 text-sm"
+    >
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+    </select>
+  </div>
+
+  {/* Center: Info */}
+  <p className="text-sm font-medium text-gray-500">
+    Showing 6 of 22 items
+  </p>
+
+  {/* Right: Buttons */}
+  <div className="flex items-center gap-2">
+    <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+      <IoIosArrowBack className="w-4 h-4" />
+    </button>
+
+    <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+      <IoIosArrowForward className="w-4 h-4" />
+    </button>
+  </div>
+
+</div>
     </div>
   );
 };
