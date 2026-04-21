@@ -1,18 +1,14 @@
 const User = require('../models/authModel');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 class authController {
   login = async (req, res) => {
     const { email, password } = req.body;
-      console.log(password, "email");
-      
 
-console.log("==== LOGIN DEBUG ====");
-console.log("Raw Body:", req.body);
-console.log("Email:", `"${email}"`);
-console.log("Password:", `"${password}"`);
-console.log("Email length:", email?.length);
-console.log("====================");
+    console.log("==== LOGIN DEBUG ====");
+    console.log("Email:", email);
+    console.log("Password:", password);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -24,7 +20,6 @@ console.log("====================");
       const user = await User.findOne({ email });
       console.log("User:", user);
 
-      // ✅ FIX: return added
       if (!user) {
         return res.status(404).json({
           message: "User not found"
@@ -39,14 +34,29 @@ console.log("====================");
         });
       }
 
+      // ✅ JWT TOKEN CREATE
+      const token = jwt.sign(
+        {
+          id: user._id,
+          email: user.email,
+          role: user.role
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+console.log("JWT SECRET:", process.env.JWT_SECRET);
+console.log("TOKEN:", token);
       res.status(200).json({
         message: "Login successful!",
-        userId: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        image: user.image,
-        category: user.category,
+        token, // ✅ send token to frontend
+        user: {
+          userId: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          image: user.image,
+          category: user.category,
+        }
       });
 
     } catch (error) {
