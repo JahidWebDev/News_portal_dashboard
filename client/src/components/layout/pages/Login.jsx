@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base_url } from "../../../config/config";
+import { base_url } from "../../../config/config";  // Ensure this path is correct
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -20,6 +20,13 @@ const Login = () => {
 
   const submit = async (e) => {
     e.preventDefault();
+
+    // Client-side validation (optional)
+    if (!state.email || !state.password) {
+      toast.error("Email and password are required");
+      return;
+    }
+
     setLoader(true);
 
     try {
@@ -33,12 +40,31 @@ const Login = () => {
         localStorage.setItem("token", data.token);
       }
 
-      console.log(data);
+      // Clear form fields after successful login
+      setState({
+        email: "",
+        password: "",
+      });
+
+      console.log(data);  // Optionally, handle the user data for routing or state management
+
+      // Optional: Redirect or take action on successful login
+      // Example: Redirect to the dashboard or home page
+      // history.push("/dashboard"); // If you're using React Router
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || "Something went wrong"
-      );
-      console.log(error);
+      // Catch network errors
+      if (error.response) {
+        // Backend returned a response (non-2xx status code)
+        toast.error(error?.response?.data?.message || "Something went wrong");
+      } else if (error.request) {
+        // No response from server
+        toast.error("Network error: No response from server");
+      } else {
+        // Other errors
+        toast.error("An error occurred: " + error.message);
+      }
+
+      console.error(error);  // Log error details for debugging
     } finally {
       setLoader(false);
     }

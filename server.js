@@ -1,17 +1,25 @@
-const express = require('express')
-const app = express()
-const dotenv = require('dotenv')
-const db_connect = require('./utils/db')
-dotenv.config()
-db_connect();
+// server.js
+require("dotenv").config();
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const db_connect = require('./utils/db');
+const authRoutes = require('./routes/authRoutes');  // Import auth routes
 
+db_connect(); 
+dotenv.config();
+ // Connect to database
+
+const app = express();
+
+// Middleware
+app.use(express.json());  // Parse JSON bodies
+app.use(cors());  // Enable CORS
+
+// Register authRoutes
+app.use('/', authRoutes);  // This registers routes under '/' (root path)
 
 const port = process.env.PORT || 5000;
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Server running on port ${port}`);
+});
