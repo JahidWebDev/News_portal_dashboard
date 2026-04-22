@@ -13,7 +13,9 @@ class AuthController {
     }
 
     try {
-      const user = await User.findOne({ email });
+      const cleanEmail = email.trim().toLowerCase();
+
+      const user = await User.findOne({ email: cleanEmail });
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -49,22 +51,35 @@ class AuthController {
       });
 
     } catch (error) {
+      console.error("LOGIN ERROR:", error);
       return res.status(500).json({ message: "Server error" });
     }
   };
 
-  // ADD WRITER (IMPORTANT FIX)
+
+  // ADD WRITER
   add_writer = async (req, res) => {
     try {
-     
+      console.log("BODY:", req.body);
 
       const { name, email, password, category } = req.body;
-         console.log("BODY:", req.body);
+
       if (!name || !email || !password || !category) {
         return res.status(400).json({ message: "All fields required" });
       }
 
-      const existing = await User.findOne({ email });
+      const cleanEmail = email.trim().toLowerCase();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(cleanEmail)) {
+        return res.status(400).json({ message: "Invalid email" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+
+      const existing = await User.findOne({ email: cleanEmail });
 
       if (existing) {
         return res.status(400).json({ message: "User already exists" });
@@ -74,21 +89,47 @@ class AuthController {
 
       const newWriter = await User.create({
         name,
-        email,
+        email: cleanEmail,
         password: hashPassword,
         category,
         role: "writer"
       });
 
+      const { password: _, ...writerWithoutPassword } = newWriter.toObject();
+
       return res.status(201).json({
         message: "Writer created successfully",
-        writer: newWriter
+        writer: writerWithoutPassword
       });
 
     } catch (error) {
+      console.error("ADD WRITER ERROR:", error);
       return res.status(500).json({ message: "Server error" });
     }
   };
+
+
+  // GET WRITERS (FIXED)
+get_writers = async (req, res) => {
+  try {
+    const writers = await User.find({
+      role: "writer"
+    }).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      total: writers.length,
+      writers: writers || []
+    });
+
+  } catch (error) {
+    console.error("GET WRITERS ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
 
 }
 
