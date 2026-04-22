@@ -1,17 +1,17 @@
 import { Outlet, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import storeContext from "../context/storeContext"; // path ঠিক করো
 
 const ProtectDashboard = () => {
-  const user = { 
-    isAuth: true,
-    name: "jahid",
-    role: "admin",
-  };
+  const { store } = useContext(storeContext);
+console.log(store);
 
-  if (!user.isAuth) {
+  // check token বা user
+  if (!store.token) {
     return <Navigate to="/login" />;
   }
 
-  return <Outlet />; 
+  return <Outlet />;
 };
 
 export default ProtectDashboard;

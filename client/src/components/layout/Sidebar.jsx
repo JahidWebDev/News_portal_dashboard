@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiFillDashboard, AiOutlinePlus } from "react-icons/ai";
 import { FiUsers } from "react-icons/fi";
 import { ImProfile } from "react-icons/im";
 import { FaPlus } from "react-icons/fa";
-
+import storeContext from "../../context/storeContext";
 const Sidebar = () => {
+ const { store  } = useContext(storeContext)
+
+
   const { pathname } = useLocation();
-    const userInfo = {
-    role: "writer"
-  };
+  //   const userInfo = {
+  //   role: "writer"
+  // };
   return (
     <div className="w-[250px] h-screen fixed left-0 top-0 bg-white shadow-lg  flex flex-col">
 
@@ -25,7 +28,7 @@ const Sidebar = () => {
       {/* Menu */}
       <ul className="px-3 flex flex-col gap-y-2 font-medium mt-4">
            {
-            userInfo.role === "admin" ? <> 
+            store.user?.role === 'admin' ? <> 
             <li>
           <Link
             to="/dashboard/admin"

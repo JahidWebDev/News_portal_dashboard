@@ -16,7 +16,7 @@ import CreateNews from "./components/layout/pages/CreateNews";
 import { WriterIndex } from "./components/layout/pages/WriterIndex";
 
 function App() {
-  const userInfo = {
+  const user = {
     role: "writer"
   };
 
@@ -35,7 +35,7 @@ function App() {
             <Route
               index
               element={
-                userInfo.role === "admin" ? (
+                user.role === "admin" ? (
                   <Navigate to="admin" replace />
                 ) : (
                   <Navigate to="writer" replace />

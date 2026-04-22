@@ -1,9 +1,10 @@
-// routes/authRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authController = require('../controllers/authControllers');
+const authController = require("../controllers/authControllers");
 
-// Define login route
-router.post('/api/login', authController.login);
+router.post("/login", authController.login);
+
+// 🔥 THIS MUST MATCH FRONTEND
+router.post("/writer/add", authController.add_writer);
 
 module.exports = router;

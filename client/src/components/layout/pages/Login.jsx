@@ -1,27 +1,32 @@
-import React, { useState } from "react";
-import { base_url } from "../../../config/config";  // Ensure this path is correct
+/* eslint-disable no-undef */
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import storeContext from "../../../context/storeContext";
+import { base_url } from "../../../config/config";
 
 const Login = () => {
   const [loader, setLoader] = useState(false);
 
+  const { dispatch } = useContext(storeContext);
+  const navigate = useNavigate();
+
   const [state, setState] = useState({
     email: "",
-    password: "",
+    password: ""
   });
 
   const inputHandle = (e) => {
     setState({
       ...state,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   const submit = async (e) => {
     e.preventDefault();
 
-    // Client-side validation (optional)
     if (!state.email || !state.password) {
       toast.error("Email and password are required");
       return;
@@ -32,44 +37,38 @@ const Login = () => {
     try {
       const { data } = await axios.post(`${base_url}/api/login`, state);
 
-      // success message
-      toast.success(data?.message || "Login Successful");
+      toast.success(data?.message || "Login Successful", {
+  duration: 1700,
+});
 
-      // optional: token save
       if (data?.token) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        dispatch({
+          type: "LOGIN_SUCCESS",
+          payload: {
+            token: data.token,
+            user: data.user
+          }
+        });
       }
 
-      // Clear form fields after successful login
-      setState({
-        email: "",
-        password: "",
-      });
+      setState({ email: "", password: "" });
 
-      console.log(data);  // Optionally, handle the user data for routing or state management
+      setTimeout(() => {
+  navigate("/dashboard");
+}, 2000);
 
-      // Optional: Redirect or take action on successful login
-      // Example: Redirect to the dashboard or home page
-      // history.push("/dashboard"); // If you're using React Router
     } catch (error) {
-      // Catch network errors
-      if (error.response) {
-        // Backend returned a response (non-2xx status code)
-        toast.error(error?.response?.data?.message || "Something went wrong");
-      } else if (error.request) {
-        // No response from server
-        toast.error("Network error: No response from server");
-      } else {
-        // Other errors
-        toast.error("An error occurred: " + error.message);
-      }
-
-      console.error(error);  // Log error details for debugging
+      toast.error(
+        error?.response?.data?.message || "Something went wrong"
+      );
+      console.log(error);
     } finally {
       setLoader(false);
     }
   };
-
   return (
     <div className="w-full min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
