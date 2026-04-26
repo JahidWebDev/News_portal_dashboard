@@ -18,10 +18,10 @@ const Login = () => {
   });
 
   const inputHandle = (e) => {
-    setState({
-      ...state,
+    setState((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value
-    });
+    }));
   };
 
   const submit = async (e) => {
@@ -35,13 +35,15 @@ const Login = () => {
     setLoader(true);
 
     try {
-      const { data } = await axios.post(`${base_url}/api/login`, state);
+      const { data } = await axios.post(
+        `${base_url}/api/login`,
+        state
+      );
 
-      toast.success(data?.message || "Login Successful", {
-  duration: 1700,
-});
+      toast.success(data?.message || "Login Successful");
 
       if (data?.token) {
+        // Save token + user
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -52,33 +54,45 @@ const Login = () => {
             user: data.user
           }
         });
+
+        // 🔥 SAFE ROLE CHECK
+        const role = data?.user?.role?.toLowerCase();
+
+        setTimeout(() => {
+          if (role === "admin") {
+            navigate("/dashboard/admin");
+          } else if (role === "writer") {
+            navigate("/dashboard/writer");
+          } else {
+            navigate("/dashboard/unable-access");
+          }
+        }, 800);
       }
 
       setState({ email: "", password: "" });
 
-      setTimeout(() => {
-  navigate("/dashboard");
-}, 2000);
-
     } catch (error) {
+      console.log("STATUS:", error?.response?.status);
+      console.log("DATA:", error?.response?.data);
+
       toast.error(
         error?.response?.data?.message || "Something went wrong"
       );
-      console.log(error);
     } finally {
       setLoader(false);
     }
   };
+
   return (
     <div className="w-full min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
-        
+
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
           jonospondon.com
         </h1>
 
         <form onSubmit={submit} className="space-y-5">
-          
+
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -119,6 +133,7 @@ const Login = () => {
           >
             {loader ? "Loading..." : "Login"}
           </button>
+
         </form>
       </div>
     </div>

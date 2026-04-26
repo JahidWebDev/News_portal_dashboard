@@ -1,0 +1,16 @@
+const express = require("express");
+const router = express.Router();
+const middlewares = require("../middlewares/middlewares");
+const newsControllers = require("../controllers/newsControllers");
+const upload = require("../middlewares/upload");
+
+
+// ✅ IMPORTANT ROUTE
+router.post(
+  "/add",
+  middlewares.auth,
+  upload.single("image"),
+  newsControllers.add_news
+);
+
+module.exports = router;

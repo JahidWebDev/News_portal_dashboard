@@ -14,6 +14,7 @@ const storeReducer = (state, action) => {
       localStorage.removeItem("token");
 
       return {
+        ...state,
         user: null,
         token: "",
       };
