@@ -3,13 +3,22 @@ import { AiOutlineClose } from "react-icons/ai";
 import { MdCloudUpload } from "react-icons/md";
 
 const Gallery = ({ setShow, images }) => {
+
+  // ✅ FIX: copy function
+  const copy_url = (url) => {
+    navigator.clipboard.writeText(url);
+    alert("Image URL copied!");
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
 
       {/* Modal */}
       <div className="relative w-[95%] md:w-[70%] lg:w-[55%] h-[88vh] bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col">
+
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b bg-white/60 backdrop-blur-md">
           <h2 className="text-xl font-semibold text-gray-800 tracking-wide">
@@ -26,6 +35,7 @@ const Gallery = ({ setShow, images }) => {
 
         {/* Body */}
         <div className="p-6 overflow-y-auto">
+
           {/* Upload Box */}
           <label
             htmlFor="images"
@@ -33,13 +43,16 @@ const Gallery = ({ setShow, images }) => {
           >
             <div className="flex flex-col items-center justify-center w-full text-gray-500 group-hover:text-purple-600 transition">
               <MdCloudUpload className="text-4xl mb-2" />
-              <span className="text-sm font-medium">Upload or drag image</span>
+              <span className="text-sm font-medium">
+                Upload or drag image
+              </span>
             </div>
           </label>
 
           {/* Image Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-            {images.length > 0 &&
+
+            {images?.length > 0 &&
               images.map((img, i) => (
                 <div
                   key={i}
@@ -60,6 +73,7 @@ const Gallery = ({ setShow, images }) => {
                   </div>
                 </div>
               ))}
+
           </div>
         </div>
       </div>
