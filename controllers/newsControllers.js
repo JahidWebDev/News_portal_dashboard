@@ -60,6 +60,23 @@ class newsController {
       });
     }
   }
+ get_images = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const images = await News.find({ userId: id }).select("image");
+console.log(images,"fsdfsfs");
+
+    res.status(200).json({
+      images,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
 }
 
 module.exports = new newsController();

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from "react";
+import React, { useRef, useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MdCloudUpload } from "react-icons/md";
 import JoditEditor from "jodit-react";
@@ -17,10 +17,11 @@ const CreateNews = () => {
   const [description, setDescription] = useState("");
   const [show, setShow] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [images, setImages] = useState([]);
 
   const editor = useRef(null);
 
-  // Image handle
+  // Image preview handle
   const imageHandle = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -29,14 +30,13 @@ const CreateNews = () => {
     }
   };
 
-  // Submit
+  // ✅ Submit News
   const added = async (e) => {
     e.preventDefault();
     setLoader(true);
 
     try {
       const formData = new FormData();
-
       formData.append("title", title);
       formData.append("description", description);
       formData.append("category", category);
@@ -48,6 +48,7 @@ const CreateNews = () => {
         {
           headers: {
             Authorization: `Bearer ${store.token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -67,6 +68,31 @@ const CreateNews = () => {
       setLoader(false);
     }
   };
+
+  // ✅ Get images for gallery
+  const get_images = async () => {
+    try {
+      const { data } = await axios.get(
+        `${base_url}/api/news/images`, // 🔥 correct endpoint (backend অনুযায়ী adjust করো)
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
+      );
+
+      setImages(data.images || []);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  // ✅ call images when modal opens
+  useEffect(() => {
+    if (show) {
+      get_images();
+    }
+  }, [show]);
 
   return (
     <div className="bg-white rounded-md">
@@ -174,7 +200,7 @@ const CreateNews = () => {
       </div>
 
       {/* Gallery */}
-      {show && <Gallery setShow={setShow} images={imageFile} />}
+      {show && <Gallery setShow={setShow} images={images} />}
     </div>
   );
 };

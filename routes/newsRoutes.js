@@ -12,5 +12,11 @@ router.post(
   upload.single("image"),
   newsControllers.add_news
 );
+router.get(
+  "/images",
+  middlewares.auth,
+ newsControllers.get_images
+ 
+);
 
 module.exports = router;
