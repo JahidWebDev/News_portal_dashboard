@@ -18,5 +18,10 @@ router.get(
  newsControllers.get_images
  
 );
-
+router.post(
+  "/images/add",
+  middlewares.auth,
+  upload.array("images"), // ✅ FIXED
+  newsControllers.add_images
+);
 module.exports = router;

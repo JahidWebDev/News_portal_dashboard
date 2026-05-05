@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.15.0",
+    "copy-text-to-clipboard": "^3.2.2",
     "copy-to-clipboard": "^3.3.3",
     "html-react-parser": "^6.0.1",
     "html-to-text": "^9.0.5",
@@ -27,6 +28,7 @@
     "react-multi-carousel": "^2.8.6",
     "react-router-dom": "^7.14.1",
     "react-spinners-components": "^2.0.4",
+    "react-toastify": "^11.1.0",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {

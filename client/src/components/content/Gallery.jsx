@@ -1,81 +1,108 @@
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { MdCloudUpload } from "react-icons/md";
+import copy from "copy-text-to-clipboard";
+import toast from "react-hot-toast";
 
-const Gallery = ({ setShow, images }) => {
+const Gallery = ({ setShow, images = [], imageHandler }) => {
 
-  // ✅ FIX: copy function
-  const copy_url = (url) => {
-    navigator.clipboard.writeText(url);
-    alert("Image URL copied!");
+  // ✅ copy url
+  const copyUrl = (url) => {
+    if (!url) return;
+    copy(url);
+    toast.success("Copy success");
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-      
+    <div className="w-screen h-screen fixed left-0 top-0 z-[9999]">
+
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+        onClick={() => setShow(false)}
+      />
 
       {/* Modal */}
-      <div className="relative w-[95%] md:w-[70%] lg:w-[55%] h-[88vh] bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col">
+      <div className="absolute bg-white w-[95%] md:w-[70%] lg:w-[55%] p-4 rounded-xl h-[85vh] overflow-y-auto left-1/2 top-1/2 z-[999] -translate-x-1/2 -translate-y-1/2">
 
         {/* Header */}
-        <div className="flex justify-between items-center px-6 py-4 border-b bg-white/60 backdrop-blur-md">
-          <h2 className="text-xl font-semibold text-gray-800 tracking-wide">
-            Media Gallery
-          </h2>
+        <div className="pb-3 flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Gallery</h2>
 
-          <button
+          <div
             onClick={() => setShow(false)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-500 hover:text-white transition-all duration-300"
+            className="text-xl cursor-pointer"
           >
             <AiOutlineClose />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-6 overflow-y-auto">
-
-          {/* Upload Box */}
-          <label
-            htmlFor="images"
-            className="group w-full h-[170px] flex rounded-2xl border-2 border-dashed border-gray-300 hover:border-purple-500 bg-gray-50 hover:bg-purple-50 transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex flex-col items-center justify-center w-full text-gray-500 group-hover:text-purple-600 transition">
-              <MdCloudUpload className="text-4xl mb-2" />
-              <span className="text-sm font-medium">
-                Upload or drag image
-              </span>
-            </div>
-          </label>
-
-          {/* Image Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-
-            {images?.length > 0 &&
-              images.map((img, i) => (
-                <div
-                  key={i}
-                  onClick={() => copy_url(img.url)}
-                  className="relative group rounded-xl overflow-hidden cursor-pointer"
-                >
-                  <img
-                    src={img.url}
-                    alt="image"
-                    className="w-full h-[120px] object-cover transition duration-300 group-hover:scale-110"
-                  />
-
-                  {/* Overlay hover */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      Copy URL
-                    </span>
-                  </div>
-                </div>
-              ))}
-
           </div>
         </div>
+
+        {/* Upload */}
+        <label
+          htmlFor="images"
+          className="w-full h-[180px] flex flex-col justify-center items-center cursor-pointer border-2 border-dashed rounded text-gray-600 hover:border-purple-500 transition"
+        >
+          <MdCloudUpload className="text-3xl mb-2" />
+          <span>Select Image</span>
+        </label>
+
+        <input
+          type="file"
+          id="images"
+          multiple
+          hidden
+          onChange={imageHandler}
+        />
+
+        {/* Images Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
+
+          {Array.isArray(images) && images.length > 0 ? (
+            images.map((img, i) => {
+
+              // ✅ SAFE URL FIX (all cases handled)
+              const imageUrl =
+                img?.image
+                  ? (img.image.startsWith("http")
+                      ? img.image
+                      : `http://localhost:5000/${img.image}`)
+                  : img?.url || "";
+
+              return (
+                <div
+                  key={i}
+                  onClick={() => copyUrl(imageUrl)}
+                  className="cursor-pointer group relative"
+                >
+
+                  <img
+                    src={imageUrl}
+                    alt="image"
+                    className="w-full h-[100px] object-cover rounded group-hover:scale-105 transition"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/150?text=No+Image";
+                    }}
+                  />
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded">
+                    <span className="text-white text-xs">
+                      Click to copy
+                    </span>
+                  </div>
+
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-gray-500 col-span-full text-center mt-4">
+              No images found
+            </p>
+          )}
+
+        </div>
+
       </div>
     </div>
   );

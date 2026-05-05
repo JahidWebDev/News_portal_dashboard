@@ -1,8 +1,11 @@
 const moment = require("moment");
 const News = require("../models/newsModel");
 const slugify = require("slugify");
+const galleryModel = require("../models/galleryModel");
+const { ObjectId } = require("mongodb");
 
 class newsController {
+  // ✅ ADD NEWS
   async add_news(req, res) {
     try {
       const { id, name } = req.user;
@@ -33,17 +36,11 @@ class newsController {
         writerName: name,
         title: cleanTitle,
         slug,
-       description: description,
+        description,
         category,
         date: moment().format("LL"),
-          image: image,
-        titleWords, // optional (if you want store words)
-      });
-
-      console.log("NEWS CREATED:", {
-        id: news._id,
-        title: news.title,
-        image: news.image,
+        image,
+        titleWords,
       });
 
       res.status(201).json({
@@ -53,30 +50,58 @@ class newsController {
       });
     } catch (error) {
       console.log("ERROR:", error);
-
       res.status(500).json({
         success: false,
         message: error.message,
       });
     }
   }
- get_images = async (req, res) => {
+
+  // ✅ GET IMAGES
+  async get_images(req, res) {
+    try {
+      const { id } = req.user;
+
+      const images = await galleryModel
+        .find({ writerId: new ObjectId(id) })
+        .sort({ createdAt: -1 });
+
+      return res.status(200).json({ images });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+async add_images(req, res) {
   try {
     const { id } = req.user;
 
-    const images = await News.find({ userId: id }).select("image");
-console.log(images,"fsdfsfs");
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        message: "No images uploaded",
+      });
+    }
 
-    res.status(200).json({
-      images,
+    const imagesData = req.files.map((file) => ({
+      writerId: id,
+      image: `http://localhost:5000/uploads/${file.filename}`, // ✅ FULL URL
+      public_id: file.filename,
+    }));
+
+    const savedImages = await galleryModel.insertMany(imagesData);
+
+    return res.status(201).json({
+      message: "Images uploaded successfully",
+      images: savedImages,
     });
+
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "Server error",
+    return res.status(500).json({
+      message: "Image upload failed",
     });
   }
-};
+}
 }
 
 module.exports = new newsController();

@@ -6,10 +6,10 @@ import Gallery from "../../content/Gallery";
 import { base_url } from "../../../config/config";
 import storeContext from "../../../context/storeContext";
 import axios from "axios";
-
+import { toast } from "react-toastify";
 const CreateNews = () => {
   const { store } = useContext(storeContext);
-
+const [ setImagesLoader] = useState(false);
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [img, setImg] = useState("");
@@ -93,6 +93,48 @@ const CreateNews = () => {
       get_images();
     }
   }, [show]);
+
+const imageHandler = async (e) => {
+  const files = e.target.files;
+
+  if (!files || files.length === 0) return;
+
+  try {
+    const formData = new FormData();
+
+    // ✅ append multiple files
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+
+    setImagesLoader(true);
+
+    const { data } = await axios.post(
+      `${base_url}/api/news/images/add`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${store.token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    setImagesLoader(false);
+
+    // ✅ SAFE CHECK (important)
+    const newImages = data.images || [];
+
+    setImages((prev) => [...prev, ...newImages]);
+
+    toast.success(data.message || "Images uploaded successfully");
+
+  } catch (error) {
+    console.log(error);
+    setImagesLoader(false);
+    toast.error(error?.response?.data?.message || "Upload failed");
+  }
+};
 
   return (
     <div className="bg-white rounded-md">
@@ -198,7 +240,7 @@ const CreateNews = () => {
 
         </form>
       </div>
-
+          <input onChange={imageHandler} type="file" multiple id="images" />
       {/* Gallery */}
       {show && <Gallery setShow={setShow} images={images} />}
     </div>
