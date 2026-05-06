@@ -7,9 +7,14 @@ import { base_url } from "../../../config/config";
 import storeContext from "../../../context/storeContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const CreateNews = () => {
   const { store } = useContext(storeContext);
-const [ setImagesLoader] = useState(false);
+
+  // ✅ FIXED HERE
+ // eslint-disable-next-line no-unused-vars
+ const [imagesLoader, setImagesLoader] = useState(false);
+
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [img, setImg] = useState("");
@@ -73,7 +78,7 @@ const [ setImagesLoader] = useState(false);
   const get_images = async () => {
     try {
       const { data } = await axios.get(
-        `${base_url}/api/news/images`, // 🔥 correct endpoint (backend অনুযায়ী adjust করো)
+        `${base_url}/api/news/images`,
         {
           headers: {
             Authorization: `Bearer ${store.token}`,
@@ -94,7 +99,7 @@ const [ setImagesLoader] = useState(false);
     }
   }, [show]);
 
-const imageHandler = async (e) => {
+  const imageHandler = async (e) => {
   const files = e.target.files;
 
   if (!files || files.length === 0) return;
@@ -102,7 +107,7 @@ const imageHandler = async (e) => {
   try {
     const formData = new FormData();
 
-    // ✅ append multiple files
+    // append files safely
     Array.from(files).forEach((file) => {
       formData.append("images", file);
     });
@@ -115,27 +120,31 @@ const imageHandler = async (e) => {
       {
         headers: {
           Authorization: `Bearer ${store.token}`,
-          "Content-Type": "multipart/form-data",
+          // ❌ IMPORTANT FIX: remove manual Content-Type
         },
       }
     );
 
     setImagesLoader(false);
 
-    // ✅ SAFE CHECK (important)
-    const newImages = data.images || [];
+    const newImages = data?.images || [];
 
     setImages((prev) => [...prev, ...newImages]);
 
-    toast.success(data.message || "Images uploaded successfully");
+    toast.success(data?.message || "Images uploaded successfully");
 
   } catch (error) {
-    console.log(error);
+    console.log("UPLOAD ERROR:", error);
+
     setImagesLoader(false);
-    toast.error(error?.response?.data?.message || "Upload failed");
+
+    toast.error(
+      error?.response?.data?.message ||
+      error.message ||
+      "Upload failed"
+    );
   }
 };
-
   return (
     <div className="bg-white rounded-md">
       {/* Header */}
@@ -240,7 +249,9 @@ const imageHandler = async (e) => {
 
         </form>
       </div>
-          <input onChange={imageHandler} type="file" multiple id="images" />
+
+      <input onChange={imageHandler} type="file" multiple id="images" />
+
       {/* Gallery */}
       {show && <Gallery setShow={setShow} images={images} />}
     </div>

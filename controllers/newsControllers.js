@@ -3,7 +3,7 @@ const News = require("../models/newsModel");
 const slugify = require("slugify");
 const galleryModel = require("../models/galleryModel");
 const { ObjectId } = require("mongodb");
-
+const cloudinary = require("../config/cloudinary");
 class newsController {
   // ✅ ADD NEWS
   async add_news(req, res) {
@@ -74,17 +74,16 @@ class newsController {
 
 async add_images(req, res) {
   try {
-    const { id } = req.user;
+    console.log("FILES:", req.files);
+    console.log("USER:", req.user);
 
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        message: "No images uploaded",
-      });
+      return res.status(400).json({ message: "No images uploaded" });
     }
 
     const imagesData = req.files.map((file) => ({
-      writerId: id,
-      image: `http://localhost:5000/uploads/${file.filename}`, // ✅ FULL URL
+      writerId: req.user.id,
+      image: file.path,
       public_id: file.filename,
     }));
 
@@ -96,9 +95,10 @@ async add_images(req, res) {
     });
 
   } catch (error) {
-    console.log(error);
+    console.log("🔥 UPLOAD ERROR:", error); // <-- IMPORTANT
     return res.status(500).json({
       message: "Image upload failed",
+      error: error.message,
     });
   }
 }

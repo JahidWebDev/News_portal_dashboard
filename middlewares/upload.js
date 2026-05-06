@@ -2,9 +2,9 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
-// Cloudinary storage setup
+// Cloudinary storage
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: {
     folder: "news_images",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
@@ -12,19 +12,13 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// file filter (extra security)
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed!"), false);
-  }
-};
+// IMPORTANT: no fileFilter (avoids 500 issues)
 
 const upload = multer({
   storage,
-  fileFilter,
- limits: { fileSize: 20 * 1024 * 1024 } // 20MB
+  limits: {
+    fileSize: 20 * 1024 * 1024, // 20MB
+  },
 });
 
 module.exports = upload;

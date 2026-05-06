@@ -1,20 +1,25 @@
 const mongoose = require("mongoose");
-
 const { Schema } = mongoose;
 
-const gallery_schema = new Schema(
+const gallerySchema = new Schema(
   {
     writerId: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "users",
+      required: true,
     },
+
     image: {
       type: String,
       required: true,
+    },
+
+    public_id: {
+      type: String,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("gallery", gallery_schema);
+// ✅ IMPORTANT FIX (correct model name)
+module.exports = mongoose.model("Gallery", gallerySchema);

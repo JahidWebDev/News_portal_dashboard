@@ -21,7 +21,7 @@ router.get(
 router.post(
   "/images/add",
   middlewares.auth,
-  upload.array("images"), // ✅ FIXED
+  upload.array("images"),
   newsControllers.add_images
 );
 module.exports = router;

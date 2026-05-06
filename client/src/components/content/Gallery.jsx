@@ -6,11 +6,10 @@ import toast from "react-hot-toast";
 
 const Gallery = ({ setShow, images = [], imageHandler }) => {
 
-  // ✅ copy url
   const copyUrl = (url) => {
     if (!url) return;
     copy(url);
-    toast.success("Copy success");
+    toast.success("Copied!");
   };
 
   return (
@@ -60,36 +59,43 @@ const Gallery = ({ setShow, images = [], imageHandler }) => {
           {Array.isArray(images) && images.length > 0 ? (
             images.map((img, i) => {
 
-              // ✅ SAFE URL FIX (all cases handled)
-              const imageUrl =
-                img?.image
-                  ? (img.image.startsWith("http")
-                      ? img.image
-                      : `http://localhost:5000/${img.image}`)
-                  : img?.url || "";
+              const imageUrl = img?.image || img?.url;
 
               return (
                 <div
                   key={i}
                   onClick={() => copyUrl(imageUrl)}
-                  className="cursor-pointer group relative"
+                  className="cursor-pointer group relative overflow-hidden rounded"
                 >
 
+                  {/* IMAGE */}
                   <img
                     src={imageUrl}
-                    alt="image"
-                    className="w-full h-[100px] object-cover rounded group-hover:scale-105 transition"
+                    alt="gallery"
+                    className="w-full h-[100px] object-cover transition duration-300 group-hover:scale-110"
                     onError={(e) => {
                       e.target.src =
                         "https://via.placeholder.com/150?text=No+Image";
                     }}
                   />
 
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded">
-                    <span className="text-white text-xs">
-                      Click to copy
-                    </span>
+                  {/* DARK HOVER LAYER */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                    
+                    {/* DOT ANIMATION */}
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></span>
+                    </div>
+
+                  </div>
+
+                  {/* COPY TEXT */}
+                  <div className="absolute bottom-1 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition">
+                    <p className="text-white text-[10px] bg-black/60 py-[2px]">
+                      Click to copy URL
+                    </p>
                   </div>
 
                 </div>
