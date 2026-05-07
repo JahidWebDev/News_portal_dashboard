@@ -1,14 +1,98 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import axios from "axios";
+
+import { base_url } from "../../config/config";
+import storeContext from "../../context/storeContext";
+import { convert } from "html-to-text";
+
 const NewsContent = () => {
+  const { store } = useContext(storeContext);
+
+  const [news, setNews] = useState([]);
+  const [all_news, set_all_news] = useState([]);
+
+  const [parpage, setparPage] = useState(5);
+  const [pages, setPages] = useState(0);
+  const [page, setpage] = useState(1);
+  const [search, setSearch] = useState("");
+
+  // GET NEWS
+  const get_news = async () => {
+    try {
+      const { data } = await axios.get(`${base_url}/api/dashboard/news`, {
+        headers: {
+          Authorization: `Bearer ${store?.token}`,
+        },
+      });
+
+      setNews(data?.news || []);
+      set_all_news(data?.news || []);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (store?.token) get_news();
+  }, [store?.token]);
+
+  // SEARCH FILTER
+  useEffect(() => {
+    const filtered = all_news.filter((item) =>
+      item.title?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    setNews(filtered);
+    setpage(1);
+  }, [search, all_news]);
+
+  // PAGE COUNT
+  useEffect(() => {
+    setPages(Math.ceil(news.length / parpage));
+  }, [news, parpage]);
+
+  // RESET PAGE IF OVER
+  useEffect(() => {
+    if (page > pages) setpage(1);
+  }, [pages]);
+
+  // PAGINATION SLICE
+  const indexOfLastNews = page * parpage;
+  const indexOfFirstNews = indexOfLastNews - parpage;
+  const currentNews = news.slice(indexOfFirstNews, indexOfLastNews);
+
+  // STATUS FILTER (FIXED 100%)
+  const type_filter = (e) => {
+    const value = e.target.value.toLowerCase();
+
+    if (value === "all") {
+      setNews(all_news);
+      setpage(1);
+      return;
+    }
+
+    const filtered = all_news.filter(
+      (item) => (item.status || "").trim().toLowerCase() === value
+    );
+
+    setNews(filtered);
+    setpage(1);
+  };
+
   return (
-    <div className="p-4 bg-gray-50 ">
-      {/* Filter Section */}
-      <div className="flex border-amber-50 flex-col md:flex-row items-center gap-4 mb-5 bg-white p-4 rounded-xl shadow-sm border">
-        <select className="px-4 py-2 border border-gray-200 rounded-lg outline-none focus:border-green-500 text-sm w-full md:w-auto">
-          <option value="">---select type---</option>
+    <div className="p-5 bg-gray-50 rounded-xl">
+
+      {/* FILTER */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+
+        <select
+          onChange={type_filter}
+          className="px-4 py-2 border border-gray-200 rounded-lg focus:border-green-500 outline-none text-sm w-full md:w-auto"
+        >
+          <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="active">Active</option>
           <option value="deactive">Deactive</option>
@@ -17,15 +101,19 @@ const NewsContent = () => {
         <input
           type="text"
           placeholder="Search news..."
-          className="px-4 py-2 rounded-lg outline-none border border-gray-200 focus:border-green-500 text-sm w-full md:w-[250px]"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 border border-gray-200 rounded-lg focus:border-green-500 outline-none text-sm w-full md:w-[250px]"
         />
       </div>
 
-      {/* Table */}
-      <div className="bg-white  shadow-sm  overflow-hidden">
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-600">
-            <thead className="text-xs uppercase bg-gray-100 text-gray-500">
+          <table className="w-full text-sm text-left">
+
+            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
               <tr>
                 <th className="px-6 py-4">No</th>
                 <th className="px-6 py-4">Title</th>
@@ -38,94 +126,136 @@ const NewsContent = () => {
               </tr>
             </thead>
 
-            <tbody>
-              <tr className="border-b border-amber-50 hover:bg-gray-50 transition">
-                <td className="px-6 py-4">1</td>
+            <tbody className="divide-y divide-gray-100">
 
-                <td className="px-6 py-4 font-medium text-gray-700">
-                  India gets its longest glass bridge
-                </td>
+              {currentNews?.length > 0 ? (
+                currentNews.map((item, index) => (
+                  <tr key={item._id || index} className="hover:bg-gray-50 transition">
 
-                <td className="px-6 py-4">
-                  <img
-                    className="w-10 h-10 rounded-lg object-cover"
-                    src="https://res.cloudinary.com/dpj4vsgbo/image/upload/v1696952625/news/g7ihrhbxqdg5luzxtd9y.webp"
-                    alt=""
-                  />
-                </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {indexOfFirstNews + index + 1}
+                    </td>
 
-                <td className="px-6 py-4 text-gray-500">Travel</td>
+                    <td className="px-6 py-4 font-medium text-gray-800">
+                      {item.title}
+                    </td>
 
-                <td className="px-6 py-4 text-gray-400">
-                  You all must have wa...
-                </td>
+                    <td className="px-6 py-4">
+                      <img
+                        className="w-11 h-11 rounded-lg object-cover"
+                        src={item.image}
+                        alt=""
+                      />
+                    </td>
 
-                <td className="px-6 py-4 text-gray-400">April 18, 2026</td>
+                    <td className="px-6 py-4 text-gray-500">
+                      {item.category}
+                    </td>
 
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600 font-medium">
-                    Active
-                  </span>
-                </td>
+                    <td className="px-6 py-4 text-gray-400">
+                      {convert(item.description || "", {
+                        wordwrap: false,
+                      }).slice(0, 25)}
+                      ...
+                    </td>
 
-                <td className="px-6 py-4">
-                  <div className="flex items-center justify-center gap-2 text-base">
-                    <Link
-                      to="/view/1"
-                      className="p-2 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition"
-                    >
-                      <FaEye />
-                    </Link>
+                    <td className="px-6 py-4 text-gray-400">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </td>
 
-                    <Link
-                      to="/edit/1"
-                      className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition"
-                    >
-                      <FaEdit />
-                    </Link>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 text-xs rounded-full font-medium ${
+                          (item.status || "").toLowerCase() === "active"
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
 
-                    <button className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition">
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-2">
+
+                        <Link
+                          to={`/view/${item._id}`}
+                          className="p-2 rounded-md bg-blue-50 text-blue-500 hover:bg-blue-100"
+                        >
+                          <FaEye />
+                        </Link>
+
+                        <Link
+                          to={`/edit/${item._id}`}
+                          className="p-2 rounded-md bg-green-50 text-green-600 hover:bg-green-100"
+                        >
+                          <FaEdit />
+                        </Link>
+
+                        <button className="p-2 rounded-md bg-red-50 text-red-500 hover:bg-red-100">
+                          <FaTrash />
+                        </button>
+
+                      </div>
+                    </td>
+
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center py-6 text-gray-400">
+                    No News Found
+                  </td>
+                </tr>
+              )}
+
             </tbody>
           </table>
         </div>
       </div>
-     <div className="flex flex-col md:flex-row items-center justify-between px-5 py-4 mt-4 bg-white rounded-xl shadow-sm text-slate-600 gap-3">
 
-  {/* Left: Per Page */}
-  <div className="flex items-center gap-3">
-    <p className="text-sm font-medium">News per Page</p>
-    <select
-      className="px-3 py-2 rounded-lg outline-none border border-gray-200 focus:border-green-500 text-sm"
-    >
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="15">15</option>
-      <option value="20">20</option>
-    </select>
-  </div>
+      {/* PAGINATION */}
+      <div className="flex flex-col md:flex-row items-center justify-between mt-5 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
 
-  {/* Center: Info */}
-  <p className="text-sm font-medium text-gray-500">
-    Showing 6 of 22 items
-  </p>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600">Per Page</span>
+          <select
+            value={parpage}
+            onChange={(e) => {
+              setparPage(Number(e.target.value));
+              setpage(1);
+            }}
+            className="px-3 py-2 border rounded-lg text-sm focus:border-green-500"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+        </div>
 
-  {/* Right: Buttons */}
-  <div className="flex items-center gap-2">
-    <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-      <IoIosArrowBack className="w-4 h-4" />
-    </button>
+        <p className="text-sm text-gray-500">
+          Page {page} of {pages}
+        </p>
 
-    <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-      <IoIosArrowForward className="w-4 h-4" />
-    </button>
-  </div>
+        <div className="flex gap-2">
 
-</div>
+          <button
+            onClick={() => setpage(page > 1 ? page - 1 : 1)}
+            className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            <IoIosArrowBack />
+          </button>
+
+          <button
+            onClick={() => setpage(page < pages ? page + 1 : pages)}
+            className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            <IoIosArrowForward />
+          </button>
+
+        </div>
+
+      </div>
     </div>
   );
 };

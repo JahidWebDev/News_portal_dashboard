@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db_connect = require("./utils/db");
+
 const authRoutes = require("./routes/authRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 
@@ -16,9 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api", authRoutes);
-app.use("/api/news", newsRoutes);
-
-
+app.use("/api", newsRoutes); // ✅ FIXED (important)
 
 const port = process.env.PORT || 5000;
 

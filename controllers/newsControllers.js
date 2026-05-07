@@ -4,6 +4,7 @@ const slugify = require("slugify");
 const galleryModel = require("../models/galleryModel");
 const { ObjectId } = require("mongodb");
 const cloudinary = require("../config/cloudinary");
+const newsModel = require("../models/newsModel");
 class newsController {
   // ✅ ADD NEWS
   async add_news(req, res) {
@@ -102,6 +103,36 @@ async add_images(req, res) {
     });
   }
 }
+
+
+
+get_dashboard_news = async (req, res) => {
+  try {
+    const { id, role } = req.user;
+
+    let news = [];
+
+    if (role === "admin") {
+      news = await newsModel.find({}).sort({ createdAt: -1 });
+    } else {
+      news = await newsModel
+        .find({ writerId: new ObjectId(id) })
+        .sort({ createdAt: -1 });
+    }
+
+    res.status(200).json({
+      success: true,
+      news,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 }
 
 module.exports = new newsController();

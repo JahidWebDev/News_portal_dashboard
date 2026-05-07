@@ -1,27 +1,37 @@
 const express = require("express");
 const router = express.Router();
+
 const middlewares = require("../middlewares/middlewares");
 const newsControllers = require("../controllers/newsControllers");
 const upload = require("../middlewares/upload");
 
-
-// ✅ IMPORTANT ROUTE
+// add news
 router.post(
   "/add",
   middlewares.auth,
   upload.single("image"),
   newsControllers.add_news
 );
+
+// images
 router.get(
   "/images",
   middlewares.auth,
- newsControllers.get_images
- 
+  newsControllers.get_images
 );
+
 router.post(
   "/images/add",
   middlewares.auth,
   upload.array("images"),
   newsControllers.add_images
 );
+
+// dashboard news
+router.get(
+  "/dashboard/news",
+  middlewares.auth,
+  newsControllers.get_dashboard_news
+);
+
 module.exports = router;
