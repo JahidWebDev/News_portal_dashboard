@@ -5,7 +5,7 @@ const middlewares = require("../middlewares/middlewares");
 const newsControllers = require("../controllers/newsControllers");
 const upload = require("../middlewares/upload");
 
-// add news
+// ================= ADD NEWS =================
 router.post(
   "/add",
   middlewares.auth,
@@ -13,7 +13,7 @@ router.post(
   newsControllers.add_news
 );
 
-// images
+// ================= IMAGES =================
 router.get(
   "/images",
   middlewares.auth,
@@ -27,11 +27,18 @@ router.post(
   newsControllers.add_images
 );
 
-// dashboard news
+// ================= DASHBOARD NEWS =================
 router.get(
   "/dashboard/news",
   middlewares.auth,
   newsControllers.get_dashboard_news
+);
+
+// ================= SINGLE NEWS =================
+router.get(
+  "/dashboard/news/:id",
+  middlewares.auth,
+  newsControllers.get_dashboard_single_news
 );
 
 module.exports = router;

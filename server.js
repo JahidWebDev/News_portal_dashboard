@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api", authRoutes);
-app.use("/api", newsRoutes); // ✅ FIXED (important)
+app.use("/api/news", newsRoutes); // ✅ FIXED (important)
 
 const port = process.env.PORT || 5000;
 

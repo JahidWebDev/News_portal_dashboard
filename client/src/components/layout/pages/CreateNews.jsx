@@ -75,22 +75,24 @@ const CreateNews = () => {
   };
 
   // ✅ Get images for gallery
-  const get_images = async () => {
-    try {
-      const { data } = await axios.get(
-        `${base_url}/api/news/images`,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-          },
-        }
-      );
+const get_images = async () => {
+  try {
+    if (!store?.token) return; // 🔥 prevent undefined token request
 
-      setImages(data.images || []);
-    } catch (error) {
-      console.log(error.response?.data || error.message);
-    }
-  };
+    const { data } = await axios.get(
+      `${base_url}/api/news/images`,
+      {
+        headers: {
+          Authorization: `Bearer ${store.token}`,
+        },
+      }
+    );
+
+    setImages(data?.images || []);
+  } catch (error) {
+    console.log(error.response?.data || error.message);
+  }
+};
 
   // ✅ call images when modal opens
   useEffect(() => {
@@ -115,16 +117,14 @@ const CreateNews = () => {
     setImagesLoader(true);
 
     const { data } = await axios.post(
-      `${base_url}/api/news/images/add`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${store.token}`,
-          // ❌ IMPORTANT FIX: remove manual Content-Type
-        },
-      }
-    );
-
+  `${base_url}/api/news/images/add`,
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${store.token}`,
+    },
+  }
+);
     setImagesLoader(false);
 
     const newImages = data?.images || [];

@@ -7,17 +7,20 @@ import Login from "./components/layout/pages/Login";
 
 import ProtectDashboard from "./middleware/ProtectDashboard";
 import ProtectRole from "./middleware/ProtectRole";
+
 import Unable from "./components/layout/pages/Unable";
 import AddWriter from "./components/layout/pages/AddWriter";
 import Writers from "./components/layout/pages/Writers";
 import News from "./components/layout/pages/News";
 import Profile from "./components/layout/pages/Profile";
 import CreateNews from "./components/layout/pages/CreateNews";
+import Edit_news from "./components/layout/pages/Edit_news";
+
 import { WriterIndex } from "./components/layout/pages/WriterIndex";
 
 function App() {
   const user = {
-    role: "writer"
+    role: "writer",
   };
 
   return (
@@ -31,7 +34,7 @@ function App() {
         <Route element={<ProtectDashboard />}>
           <Route path="/dashboard" element={<MainLayout />}>
 
-            {/* ✅ Role based redirect */}
+            {/* Role Based Redirect */}
             <Route
               index
               element={
@@ -43,6 +46,7 @@ function App() {
               }
             />
 
+            {/* Common Routes */}
             <Route path="unable-access" element={<Unable />} />
             <Route path="news" element={<News />} />
             <Route path="profile" element={<Profile />} />
@@ -58,12 +62,18 @@ function App() {
             <Route element={<ProtectRole role="writer" />}>
               <Route path="writer" element={<WriterIndex />} />
               <Route path="news/create" element={<CreateNews />} />
+
+              {/* Edit News Route */}
+              <Route
+                path="news/edit/:id"
+                element={<Edit_news />}
+              />
             </Route>
 
           </Route>
         </Route>
 
-        {/* Root redirect */}
+        {/* Root Redirect */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* 404 */}

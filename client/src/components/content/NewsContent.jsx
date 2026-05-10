@@ -14,72 +14,96 @@ const NewsContent = () => {
   const [news, setNews] = useState([]);
   const [all_news, set_all_news] = useState([]);
 
-  const [parpage, setparPage] = useState(5);
+  const [page, setPage] = useState(1);
+  const [parpage, setParPage] = useState(5);
   const [pages, setPages] = useState(0);
-  const [page, setpage] = useState(1);
+
   const [search, setSearch] = useState("");
 
-  // GET NEWS
+  // ======================
+  // GET NEWS (FIXED ROUTE)
+  // ======================
   const get_news = async () => {
     try {
-      const { data } = await axios.get(`${base_url}/api/dashboard/news`, {
-        headers: {
-          Authorization: `Bearer ${store?.token}`,
-        },
-      });
+      if (!store?.token) return;
 
-      setNews(data?.news || []);
-      set_all_news(data?.news || []);
+      const { data } = await axios.get(
+        `${base_url}/api/news/dashboard/news`,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
+      );
+
+      const newsData = data?.news || [];
+
+      setNews(newsData);
+      set_all_news(newsData);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
   };
 
   useEffect(() => {
-    if (store?.token) get_news();
+    if (store?.token) {
+      get_news();
+    }
   }, [store?.token]);
 
+  // ======================
   // SEARCH FILTER
+  // ======================
   useEffect(() => {
-    const filtered = all_news.filter((item) =>
-      item.title?.toLowerCase().includes(search.toLowerCase())
-    );
+    let filtered = [...all_news];
+
+    if (search) {
+      filtered = filtered.filter((item) =>
+        item.title?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
     setNews(filtered);
-    setpage(1);
+    setPage(1);
   }, [search, all_news]);
 
-  // PAGE COUNT
+  // ======================
+  // PAGE COUNT (FIXED)
+  // ======================
   useEffect(() => {
     setPages(Math.ceil(news.length / parpage));
   }, [news, parpage]);
 
-  // RESET PAGE IF OVER
+  // reset page safety
   useEffect(() => {
-    if (page > pages) setpage(1);
-  }, [pages]);
+    if (page > pages) {
+      setPage(1);
+    }
+  }, [pages, page]);
 
-  // PAGINATION SLICE
+  // ======================
+  // PAGINATION
+  // ======================
   const indexOfLastNews = page * parpage;
   const indexOfFirstNews = indexOfLastNews - parpage;
   const currentNews = news.slice(indexOfFirstNews, indexOfLastNews);
 
-  // STATUS FILTER (FIXED 100%)
+  // ======================
+  // STATUS FILTER (FIXED)
+  // ======================
   const type_filter = (e) => {
     const value = e.target.value.toLowerCase();
 
     if (value === "all") {
       setNews(all_news);
-      setpage(1);
-      return;
+    } else {
+      const filtered = all_news.filter(
+        (n) => (n.status || "").toLowerCase() === value
+      );
+      setNews(filtered);
     }
 
-    const filtered = all_news.filter(
-      (item) => (item.status || "").trim().toLowerCase() === value
-    );
-
-    setNews(filtered);
-    setpage(1);
+    setPage(1);
   };
 
   return (
@@ -130,7 +154,7 @@ const NewsContent = () => {
 
               {currentNews?.length > 0 ? (
                 currentNews.map((item, index) => (
-                  <tr key={item._id || index} className="hover:bg-gray-50 transition">
+                  <tr key={item._id || index} className="hover:bg-gray-50">
 
                     <td className="px-6 py-4 text-gray-600">
                       {indexOfFirstNews + index + 1}
@@ -143,7 +167,7 @@ const NewsContent = () => {
                     <td className="px-6 py-4">
                       <img
                         className="w-11 h-11 rounded-lg object-cover"
-                        src={item.image}
+                        src={item.image || "/placeholder.png"}
                         alt=""
                       />
                     </td>
@@ -160,7 +184,9 @@ const NewsContent = () => {
                     </td>
 
                     <td className="px-6 py-4 text-gray-400">
-                      {new Date(item.createdAt).toLocaleDateString()}
+                      {item.createdAt
+                        ? new Date(item.createdAt).toLocaleDateString()
+                        : "No date"}
                     </td>
 
                     <td className="px-6 py-4">
@@ -168,6 +194,8 @@ const NewsContent = () => {
                         className={`px-3 py-1 text-xs rounded-full font-medium ${
                           (item.status || "").toLowerCase() === "active"
                             ? "bg-green-100 text-green-600"
+                            : (item.status || "").toLowerCase() === "pending"
+                            ? "bg-yellow-100 text-yellow-600"
                             : "bg-red-100 text-red-600"
                         }`}
                       >
@@ -180,19 +208,19 @@ const NewsContent = () => {
 
                         <Link
                           to={`/view/${item._id}`}
-                          className="p-2 rounded-md bg-blue-50 text-blue-500 hover:bg-blue-100"
+                          className="p-2 bg-blue-50 text-blue-500 rounded-md"
                         >
                           <FaEye />
                         </Link>
 
                         <Link
-                          to={`/edit/${item._id}`}
-                          className="p-2 rounded-md bg-green-50 text-green-600 hover:bg-green-100"
+                          to={`/dashboard/news/edit/${item._id}`}
+                          className="p-2 bg-green-50 text-green-600 rounded-md"
                         >
                           <FaEdit />
                         </Link>
 
-                        <button className="p-2 rounded-md bg-red-50 text-red-500 hover:bg-red-100">
+                        <button className="p-2 bg-red-50 text-red-500 rounded-md">
                           <FaTrash />
                         </button>
 
@@ -219,13 +247,14 @@ const NewsContent = () => {
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-600">Per Page</span>
+
           <select
             value={parpage}
             onChange={(e) => {
-              setparPage(Number(e.target.value));
-              setpage(1);
+              setParPage(Number(e.target.value));
+              setPage(1);
             }}
-            className="px-3 py-2 border rounded-lg text-sm focus:border-green-500"
+            className="px-3 py-2 border rounded-lg text-sm"
           >
             <option value="5">5</option>
             <option value="10">10</option>
@@ -234,21 +263,21 @@ const NewsContent = () => {
         </div>
 
         <p className="text-sm text-gray-500">
-          Page {page} of {pages}
+          Page {page} of {pages || 1}
         </p>
 
         <div className="flex gap-2">
 
           <button
-            onClick={() => setpage(page > 1 ? page - 1 : 1)}
-            className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+            onClick={() => setPage(page > 1 ? page - 1 : 1)}
+            className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowBack />
           </button>
 
           <button
-            onClick={() => setpage(page < pages ? page + 1 : pages)}
-            className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+            onClick={() => setPage(page < pages ? page + 1 : pages)}
+            className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowForward />
           </button>

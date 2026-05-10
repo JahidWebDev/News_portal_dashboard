@@ -75,15 +75,12 @@ class newsController {
 
 async add_images(req, res) {
   try {
-    console.log("FILES:", req.files);
-    console.log("USER:", req.user);
-
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No images uploaded" });
     }
 
     const imagesData = req.files.map((file) => ({
-      writerId: req.user.id,
+      writerId: new ObjectId(req.user.id),
       image: file.path,
       public_id: file.filename,
     }));
@@ -96,7 +93,8 @@ async add_images(req, res) {
     });
 
   } catch (error) {
-    console.log("🔥 UPLOAD ERROR:", error); // <-- IMPORTANT
+    console.log("UPLOAD ERROR:", error);
+
     return res.status(500).json({
       message: "Image upload failed",
       error: error.message,
@@ -130,7 +128,35 @@ get_dashboard_news = async (req, res) => {
       message: error.message,
     });
   }
+  
 };
+
+
+get_dashboard_single_news = async (req, res) => {
+  const { id } = req.params;
+
+  console.log("NEWS ID:", id);
+
+  try {
+    const news = await newsModel.findById(id);
+
+    if (!news) {
+      return res.status(404).json({
+        message: "News not found",
+      });
+    }
+
+    return res.status(200).json({
+      news,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 
 
 }
