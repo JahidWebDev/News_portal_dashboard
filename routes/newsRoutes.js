@@ -12,6 +12,13 @@ router.post(
   upload.single("image"),
   newsControllers.add_news
 );
+// ================= UPDATE NEWS =================
+router.put(
+  "/:id",
+  middlewares.auth,
+  upload.single("image"),
+  newsControllers.update_news
+);
 
 // ================= IMAGES =================
 router.get(

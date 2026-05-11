@@ -104,6 +104,8 @@ const Edit_news = () => {
   // ======================
   const added = async (e) => {
     e.preventDefault();
+
+    if (loader) return;
     setLoader(true);
 
     try {
@@ -118,7 +120,7 @@ const Edit_news = () => {
       }
 
       const { data } = await axios.put(
-        `${base_url}/api/dashboard/news/${id}`,
+        `${base_url}/api/news/${id}`,
         formData,
         {
           headers: {
@@ -127,11 +129,15 @@ const Edit_news = () => {
         }
       );
 
-      toast.success(data?.message || "Updated successfully");
+      toast.success(data?.message || "News updated successfully");
 
     } catch (error) {
-      console.log(error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Update failed");
+      console.log(error?.response?.data || error.message);
+
+      toast.error(
+        error?.response?.data?.message || "Something went wrong"
+      );
+
     } finally {
       setLoader(false);
     }
@@ -166,7 +172,7 @@ const Edit_news = () => {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:border-green-500 outline-none"
+              className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg outline-none"
               type="text"
               required
             />
@@ -178,7 +184,7 @@ const Edit_news = () => {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:border-green-500 outline-none"
+              className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg outline-none"
               required
             >
               <option value="">Select Category</option>
@@ -193,7 +199,7 @@ const Edit_news = () => {
           <div className="mb-5">
             <label className="text-sm text-gray-600">Image</label>
 
-            <label className="mt-2 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl h-52 cursor-pointer hover:border-green-500">
+            <label className="mt-2 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl h-52 cursor-pointer">
 
               {img ? (
                 <img
@@ -218,12 +224,12 @@ const Edit_news = () => {
 
           {/* DESCRIPTION */}
           <div className="mb-5">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex justify-between mb-2">
               <label className="text-sm text-gray-600">Description</label>
 
               <MdCloudUpload
                 onClick={() => setShow(true)}
-                className="text-xl cursor-pointer text-gray-500 hover:text-green-500"
+                className="cursor-pointer text-gray-500 hover:text-green-500"
               />
             </div>
 
@@ -241,6 +247,7 @@ const Edit_news = () => {
           >
             {loader ? "Loading..." : "Update News"}
           </button>
+
         </form>
       </div>
 

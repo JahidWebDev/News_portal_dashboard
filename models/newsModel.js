@@ -23,7 +23,6 @@ const newsSchema = new Schema(
     slug: {
       type: String,
       required: true,
-      unique: true, // ✅ important
       trim: true,
     },
 
@@ -32,9 +31,10 @@ const newsSchema = new Schema(
       required: true,
     },
 
+    // ✅ FIXED: support single OR multiple image future-safe
     image: {
-      type: String,
-      default: "",
+      type: [String], // 🔥 better than String
+      default: [],
     },
 
     category: {
@@ -43,14 +43,14 @@ const newsSchema = new Schema(
     },
 
     date: {
-      type: Date, // ✅ FIXED
+      type: Date,
       default: Date.now,
     },
 
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"], // ✅ better control
-      default: "pending", // ✅ fixed spelling
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
 
     count: {
