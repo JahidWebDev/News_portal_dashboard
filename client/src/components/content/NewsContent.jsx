@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 import { base_url } from "../../config/config";
 import storeContext from "../../context/storeContext";
@@ -21,7 +22,55 @@ const NewsContent = () => {
   const [search, setSearch] = useState("");
 
   // ======================
-  // GET NEWS (FIXED ROUTE)
+  // STATUS CHANGE
+  // ======================
+  const changeStatus = async (id, currentStatus) => {
+    let newStatus = "";
+
+    if ((currentStatus || "").toLowerCase() === "active") {
+      newStatus = "pending";
+    } else if ((currentStatus || "").toLowerCase() === "pending") {
+      newStatus = "deactive";
+    } else {
+      newStatus = "active";
+    }
+
+    try {
+      const { data } = await axios.put(
+        `${base_url}/api/news/status-update/${id}`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${store?.token}`,
+          },
+        }
+      );
+
+      toast.success(data?.message || "Status updated");
+
+      // update news instantly
+      setNews((prev) =>
+        prev.map((item) =>
+          item._id === id ? { ...item, status: newStatus } : item
+        )
+      );
+
+      // update all news instantly
+      set_all_news((prev) =>
+        prev.map((item) =>
+          item._id === id ? { ...item, status: newStatus } : item
+        )
+      );
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      toast.error(
+        error?.response?.data?.message || "Status update failed"
+      );
+    }
+  };
+
+  // ======================
+  // GET NEWS
   // ======================
   const get_news = async () => {
     try {
@@ -68,13 +117,15 @@ const NewsContent = () => {
   }, [search, all_news]);
 
   // ======================
-  // PAGE COUNT (FIXED)
+  // PAGE COUNT
   // ======================
   useEffect(() => {
     setPages(Math.ceil(news.length / parpage));
   }, [news, parpage]);
 
-  // reset page safety
+  // ======================
+  // PAGE SAFETY
+  // ======================
   useEffect(() => {
     if (page > pages) {
       setPage(1);
@@ -89,7 +140,7 @@ const NewsContent = () => {
   const currentNews = news.slice(indexOfFirstNews, indexOfLastNews);
 
   // ======================
-  // STATUS FILTER (FIXED)
+  // STATUS FILTER
   // ======================
   const type_filter = (e) => {
     const value = e.target.value.toLowerCase();
@@ -100,6 +151,7 @@ const NewsContent = () => {
       const filtered = all_news.filter(
         (n) => (n.status || "").toLowerCase() === value
       );
+
       setNews(filtered);
     }
 
@@ -108,10 +160,8 @@ const NewsContent = () => {
 
   return (
     <div className="p-5 bg-gray-50 rounded-xl">
-
       {/* FILTER */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-
         <select
           onChange={type_filter}
           className="px-4 py-2 border border-gray-200 rounded-lg focus:border-green-500 outline-none text-sm w-full md:w-auto"
@@ -133,10 +183,8 @@ const NewsContent = () => {
 
       {/* TABLE */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-
             <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
               <tr>
                 <th className="px-6 py-4">No</th>
@@ -151,11 +199,12 @@ const NewsContent = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-
               {currentNews?.length > 0 ? (
                 currentNews.map((item, index) => (
-                  <tr key={item._id || index} className="hover:bg-gray-50">
-
+                  <tr
+                    key={item._id || index}
+                    className="hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4 text-gray-600">
                       {indexOfFirstNews + index + 1}
                     </td>
@@ -185,27 +234,35 @@ const NewsContent = () => {
 
                     <td className="px-6 py-4 text-gray-400">
                       {item.createdAt
-                        ? new Date(item.createdAt).toLocaleDateString()
+                        ? new Date(
+                            item.createdAt
+                          ).toLocaleDateString()
                         : "No date"}
                     </td>
 
+                    {/* STATUS */}
                     <td className="px-6 py-4">
-                      <span
-                        className={`px-3 py-1 text-xs rounded-full font-medium ${
-                          (item.status || "").toLowerCase() === "active"
-                            ? "bg-green-100 text-green-600"
-                            : (item.status || "").toLowerCase() === "pending"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : "bg-red-100 text-red-600"
+                      <button
+                        onClick={() =>
+                          changeStatus(item._id, item.status)
+                        }
+                        className={`px-3 py-1 text-xs rounded-full font-medium capitalize transition-all duration-200 ${
+                          (item.status || "").toLowerCase() ===
+                          "active"
+                            ? "bg-green-100 text-green-600 hover:bg-green-200"
+                            : (item.status || "").toLowerCase() ===
+                              "pending"
+                            ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                            : "bg-red-100 text-red-600 hover:bg-red-200"
                         }`}
                       >
                         {item.status}
-                      </span>
+                      </button>
                     </td>
 
+                    {/* ACTION */}
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-
                         <Link
                           to={`/view/${item._id}`}
                           className="p-2 bg-blue-50 text-blue-500 rounded-md"
@@ -213,30 +270,34 @@ const NewsContent = () => {
                           <FaEye />
                         </Link>
 
-                        <Link
-                          to={`/dashboard/news/edit/${item._id}`}
-                          className="p-2 bg-green-50 text-green-600 rounded-md"
-                        >
-                          <FaEdit />
-                        </Link>
+                        {store?.user?.role === "writer" && (
+                          <>
+                            <Link
+                              to={`/dashboard/news/edit/${item._id}`}
+                              className="p-2 bg-green-50 text-green-600 rounded-md"
+                            >
+                              <FaEdit />
+                            </Link>
 
-                        <button className="p-2 bg-red-50 text-red-500 rounded-md">
-                          <FaTrash />
-                        </button>
-
+                            <button className="p-2 bg-red-50 text-red-500 rounded-md">
+                              <FaTrash />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
-
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-6 text-gray-400">
+                  <td
+                    colSpan="8"
+                    className="text-center py-6 text-gray-400"
+                  >
                     No News Found
                   </td>
                 </tr>
               )}
-
             </tbody>
           </table>
         </div>
@@ -244,9 +305,10 @@ const NewsContent = () => {
 
       {/* PAGINATION */}
       <div className="flex flex-col md:flex-row items-center justify-between mt-5 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600">Per Page</span>
+          <span className="text-sm text-gray-600">
+            Per Page
+          </span>
 
           <select
             value={parpage}
@@ -267,23 +329,24 @@ const NewsContent = () => {
         </p>
 
         <div className="flex gap-2">
-
           <button
-            onClick={() => setPage(page > 1 ? page - 1 : 1)}
+            onClick={() =>
+              setPage(page > 1 ? page - 1 : 1)
+            }
             className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowBack />
           </button>
 
           <button
-            onClick={() => setPage(page < pages ? page + 1 : pages)}
+            onClick={() =>
+              setPage(page < pages ? page + 1 : pages)
+            }
             className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowForward />
           </button>
-
         </div>
-
       </div>
     </div>
   );

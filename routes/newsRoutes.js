@@ -48,4 +48,6 @@ router.get(
   newsControllers.get_dashboard_single_news
 );
 
+router.put('/status-update/:id', middlewares.auth, newsControllers.update_news_status)
+
 module.exports = router;

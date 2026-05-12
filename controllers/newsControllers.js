@@ -236,6 +236,47 @@ get_dashboard_single_news = async (req, res) => {
 
 
 
+
+update_news_status = async (req, res) => {
+  try {
+    const { role } = req.user;
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // admin + writer both allowed
+    if (role === "admin" || role === "writer") {
+
+      const news = await newsModel.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "News status updated successfully",
+        news,
+      });
+
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "You cannot access this api",
+      });
+    }
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
 }
 
 module.exports = new newsController();
