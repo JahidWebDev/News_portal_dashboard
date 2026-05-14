@@ -22,6 +22,25 @@ const NewsContent = () => {
   const [search, setSearch] = useState("");
 
   // ======================
+  // DELETE NEWS (FIXED)
+  // ======================
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${base_url}/api/news/${id}`, {
+        headers: {
+          Authorization: `Bearer ${store?.token}`,
+        },
+      });
+
+      toast.success("News deleted");
+
+      get_news();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Delete failed");
+    }
+  };
+
+  // ======================
   // STATUS CHANGE
   // ======================
   const changeStatus = async (id, currentStatus) => {
@@ -43,7 +62,7 @@ const NewsContent = () => {
           headers: {
             Authorization: `Bearer ${store?.token}`,
           },
-        }
+        },
       );
 
       toast.success(data?.message || "Status updated");
@@ -51,21 +70,19 @@ const NewsContent = () => {
       // update news instantly
       setNews((prev) =>
         prev.map((item) =>
-          item._id === id ? { ...item, status: newStatus } : item
-        )
+          item._id === id ? { ...item, status: newStatus } : item,
+        ),
       );
 
       // update all news instantly
       set_all_news((prev) =>
         prev.map((item) =>
-          item._id === id ? { ...item, status: newStatus } : item
-        )
+          item._id === id ? { ...item, status: newStatus } : item,
+        ),
       );
     } catch (error) {
       console.log(error.response?.data || error.message);
-      toast.error(
-        error?.response?.data?.message || "Status update failed"
-      );
+      toast.error(error?.response?.data?.message || "Status update failed");
     }
   };
 
@@ -76,14 +93,11 @@ const NewsContent = () => {
     try {
       if (!store?.token) return;
 
-      const { data } = await axios.get(
-        `${base_url}/api/news/dashboard/news`,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-          },
-        }
-      );
+      const { data } = await axios.get(`${base_url}/api/news/dashboard/news`, {
+        headers: {
+          Authorization: `Bearer ${store.token}`,
+        },
+      });
 
       const newsData = data?.news || [];
 
@@ -108,7 +122,7 @@ const NewsContent = () => {
 
     if (search) {
       filtered = filtered.filter((item) =>
-        item.title?.toLowerCase().includes(search.toLowerCase())
+        item.title?.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
@@ -149,7 +163,7 @@ const NewsContent = () => {
       setNews(all_news);
     } else {
       const filtered = all_news.filter(
-        (n) => (n.status || "").toLowerCase() === value
+        (n) => (n.status || "").toLowerCase() === value,
       );
 
       setNews(filtered);
@@ -201,10 +215,7 @@ const NewsContent = () => {
             <tbody className="divide-y divide-gray-100">
               {currentNews?.length > 0 ? (
                 currentNews.map((item, index) => (
-                  <tr
-                    key={item._id || index}
-                    className="hover:bg-gray-50"
-                  >
+                  <tr key={item._id || index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-gray-600">
                       {indexOfFirstNews + index + 1}
                     </td>
@@ -221,9 +232,7 @@ const NewsContent = () => {
                       />
                     </td>
 
-                    <td className="px-6 py-4 text-gray-500">
-                      {item.category}
-                    </td>
+                    <td className="px-6 py-4 text-gray-500">{item.category}</td>
 
                     <td className="px-6 py-4 text-gray-400">
                       {convert(item.description || "", {
@@ -234,26 +243,20 @@ const NewsContent = () => {
 
                     <td className="px-6 py-4 text-gray-400">
                       {item.createdAt
-                        ? new Date(
-                            item.createdAt
-                          ).toLocaleDateString()
+                        ? new Date(item.createdAt).toLocaleDateString()
                         : "No date"}
                     </td>
 
                     {/* STATUS */}
                     <td className="px-6 py-4">
                       <button
-                        onClick={() =>
-                          changeStatus(item._id, item.status)
-                        }
+                        onClick={() => changeStatus(item._id, item.status)}
                         className={`px-3 py-1 text-xs rounded-full font-medium capitalize transition-all duration-200 ${
-                          (item.status || "").toLowerCase() ===
-                          "active"
+                          (item.status || "").toLowerCase() === "active"
                             ? "bg-green-100 text-green-600 hover:bg-green-200"
-                            : (item.status || "").toLowerCase() ===
-                              "pending"
-                            ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-                            : "bg-red-100 text-red-600 hover:bg-red-200"
+                            : (item.status || "").toLowerCase() === "pending"
+                              ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                              : "bg-red-100 text-red-600 hover:bg-red-200"
                         }`}
                       >
                         {item.status}
@@ -279,7 +282,10 @@ const NewsContent = () => {
                               <FaEdit />
                             </Link>
 
-                            <button className="p-2 bg-red-50 text-red-500 rounded-md">
+                            <button
+                              onClick={() => handleDelete(item._id)}
+                              className="p-2 bg-red-50 text-red-500 rounded-md"
+                            >
                               <FaTrash />
                             </button>
                           </>
@@ -290,10 +296,7 @@ const NewsContent = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="8"
-                    className="text-center py-6 text-gray-400"
-                  >
+                  <td colSpan="8" className="text-center py-6 text-gray-400">
                     No News Found
                   </td>
                 </tr>
@@ -306,9 +309,7 @@ const NewsContent = () => {
       {/* PAGINATION */}
       <div className="flex flex-col md:flex-row items-center justify-between mt-5 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600">
-            Per Page
-          </span>
+          <span className="text-sm text-gray-600">Per Page</span>
 
           <select
             value={parpage}
@@ -330,18 +331,14 @@ const NewsContent = () => {
 
         <div className="flex gap-2">
           <button
-            onClick={() =>
-              setPage(page > 1 ? page - 1 : 1)
-            }
+            onClick={() => setPage(page > 1 ? page - 1 : 1)}
             className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowBack />
           </button>
 
           <button
-            onClick={() =>
-              setPage(page < pages ? page + 1 : pages)
-            }
+            onClick={() => setPage(page < pages ? page + 1 : pages)}
             className="p-2 bg-gray-100 rounded-md"
           >
             <IoIosArrowForward />

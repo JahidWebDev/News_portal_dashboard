@@ -49,5 +49,12 @@ router.get(
 );
 
 router.put('/status-update/:id', middlewares.auth, newsControllers.update_news_status)
+router.get("/", newsControllers.get_all_news);
 
+// ================= DELETE NEWS =================
+router.delete(
+  "/:id",
+  middlewares.auth,
+  newsControllers.delete_news
+);
 module.exports = router;

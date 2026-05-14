@@ -274,8 +274,34 @@ update_news_status = async (req, res) => {
     });
   }
 };
+async get_all_news(req, res) {
+  try {
+    const news = await newsModel.find({}).sort({ createdAt: -1 });
 
+    res.status(200).json(news);
+  } catch (error) {
+    console.log(error.message);
 
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+delete_news = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await News.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "News deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 }
 

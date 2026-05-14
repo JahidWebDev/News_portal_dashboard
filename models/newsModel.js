@@ -31,15 +31,14 @@ const newsSchema = new Schema(
       required: true,
     },
 
-    // ✅ FIXED: support single OR multiple image future-safe
     image: {
-      type: [String], // 🔥 better than String
-      default: [],
+      type: String,
+      default: "",
     },
 
     category: {
       type: String,
-      default: "all",
+      required: true,
     },
 
     date: {
@@ -49,7 +48,7 @@ const newsSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
+      enum: ["pending", "active", "deactive"],
       default: "pending",
     },
 
