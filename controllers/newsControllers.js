@@ -85,10 +85,11 @@ async update_news(req, res) {
   
   // ✅ ADD NEWS
   async add_news(req, res) {
+
     try {
       const { id, name } = req.user;
       const { title, description, category } = req.body;
-
+    
       if (!title || !description || !category) {
         return res.status(400).json({
           success: false,
@@ -120,7 +121,8 @@ async update_news(req, res) {
         image,
         titleWords,
       });
-
+    
+    
       res.status(201).json({
         success: true,
         message: "News added successfully",

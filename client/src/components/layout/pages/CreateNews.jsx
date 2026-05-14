@@ -11,9 +11,7 @@ import { toast } from "react-toastify";
 const CreateNews = () => {
   const { store } = useContext(storeContext);
 
-  // ✅ FIXED HERE
- // eslint-disable-next-line no-unused-vars
- const [imagesLoader, setImagesLoader] = useState(false);
+  const [imagesLoader, setImagesLoader] = useState(false);
 
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
@@ -26,16 +24,30 @@ const CreateNews = () => {
 
   const editor = useRef(null);
 
-  // Image preview handle
+  // ---------------- CATEGORY LIST ----------------
+  const categories = [
+    { value: "sports", label: "খেলা" },
+    { value: "politics", label: "রাজনীতি" },
+    { value: "tech", label: "প্রযুক্তি" },
+    { value: "international", label: "আন্তর্জাতিক" },
+    { value: "national", label: "জাতীয়" },
+    { value: "country", label: "দেশজুড়ে" },
+    { value: "capital", label: "রাজধানী" },
+    { value: "economy", label: "অর্থনীতি" },
+    { value: "entertainment", label: "বিনোদন" },
+    { value: "lifestyle", label: "লাইফস্টাইল" },
+  ];
+
+  // ---------------- IMAGE PREVIEW ----------------
   const imageHandle = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImg(URL.createObjectURL(file));
-      setImageFile(file);
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImg(URL.createObjectURL(file));
+    setImageFile(file);
   };
 
-  // ✅ Submit News
+  // ---------------- ADD NEWS ----------------
   const added = async (e) => {
     e.preventDefault();
     setLoader(true);
@@ -58,7 +70,7 @@ const CreateNews = () => {
         }
       );
 
-      console.log("Response:", data);
+      toast.success(data?.message || "News added successfully");
 
       // reset
       setTitle("");
@@ -69,84 +81,74 @@ const CreateNews = () => {
 
     } catch (error) {
       console.log(error.response?.data || error.message);
+      toast.error("Failed to add news");
     } finally {
       setLoader(false);
     }
   };
 
-  // ✅ Get images for gallery
-const get_images = async () => {
-  try {
-    if (!store?.token) return; // 🔥 prevent undefined token request
+  // ---------------- GET IMAGES ----------------
+  const get_images = async () => {
+    try {
+      if (!store?.token) return;
 
-    const { data } = await axios.get(
-      `${base_url}/api/news/images`,
-      {
-        headers: {
-          Authorization: `Bearer ${store.token}`,
-        },
-      }
-    );
+      const { data } = await axios.get(
+        `${base_url}/api/news/images`,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
+      );
 
-    setImages(data?.images || []);
-  } catch (error) {
-    console.log(error.response?.data || error.message);
-  }
-};
-
-  // ✅ call images when modal opens
-  useEffect(() => {
-    if (show) {
-      get_images();
+      setImages(data?.images || []);
+    } catch (error) {
+      console.log(error.message);
     }
+  };
+
+  useEffect(() => {
+    if (show) get_images();
   }, [show]);
 
+  // ---------------- MULTI IMAGE UPLOAD ----------------
   const imageHandler = async (e) => {
-  const files = e.target.files;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-  if (!files || files.length === 0) return;
+    try {
+      setImagesLoader(true);
 
-  try {
-    const formData = new FormData();
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append("images", file);
+      });
 
-    // append files safely
-    Array.from(files).forEach((file) => {
-      formData.append("images", file);
-    });
+      const { data } = await axios.post(
+        `${base_url}/api/news/images/add`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
+      );
 
-    setImagesLoader(true);
+      setImages((prev) => [...prev, ...(data?.images || [])]);
 
-    const { data } = await axios.post(
-  `${base_url}/api/news/images/add`,
-  formData,
-  {
-    headers: {
-      Authorization: `Bearer ${store.token}`,
-    },
-  }
-);
-    setImagesLoader(false);
+      toast.success(data?.message || "Images uploaded");
 
-    const newImages = data?.images || [];
+    } catch (error) {
+      console.log(error.message);
+      toast.error("Upload failed");
+    } finally {
+      setImagesLoader(false);
+    }
+  };
 
-    setImages((prev) => [...prev, ...newImages]);
-
-    toast.success(data?.message || "Images uploaded successfully");
-
-  } catch (error) {
-    console.log("UPLOAD ERROR:", error);
-
-    setImagesLoader(false);
-
-    toast.error(
-      error?.response?.data?.message ||
-      error.message ||
-      "Upload failed"
-    );
-  }
-};
   return (
     <div className="bg-white rounded-md">
+
       {/* Header */}
       <div className="flex justify-between p-4">
         <h2 className="text-xl font-medium">Add News</h2>
@@ -175,7 +177,7 @@ const get_images = async () => {
             />
           </div>
 
-          {/* Category */}
+          {/* CATEGORY (FIXED - dynamic) */}
           <div className="flex flex-col gap-y-2 mb-6">
             <label className="text-md font-medium text-gray-600">Category</label>
             <select
@@ -185,10 +187,12 @@ const get_images = async () => {
               className="px-3 py-2 rounded-md border border-gray-300 focus:border-green-500 outline-none h-10"
             >
               <option value="">Select Category</option>
-              <option value="sports">Sports</option>
-              <option value="politics">Politics</option>
-              <option value="tech">Tech</option>
-              <option value="entertainment">Entertainment</option>
+
+              {categories.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
             </select>
           </div>
 

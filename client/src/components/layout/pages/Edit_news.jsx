@@ -103,45 +103,53 @@ const Edit_news = () => {
   // UPDATE NEWS
   // ======================
   const added = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (loader) return;
-    setLoader(true);
+  if (!store?.token) {
+    toast.error("Unauthorized user");
+    return;
+  }
 
-    try {
-      const formData = new FormData();
+  setLoader(true);
 
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("category", category);
+  try {
+    const formData = new FormData();
 
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
 
-      const { data } = await axios.put(
-        `${base_url}/api/news/${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${store?.token}`,
-          },
-        }
-      );
-
-      toast.success(data?.message || "News updated successfully");
-
-    } catch (error) {
-      console.log(error?.response?.data || error.message);
-
-      toast.error(
-        error?.response?.data?.message || "Something went wrong"
-      );
-
-    } finally {
-      setLoader(false);
+    if (imageFile) {
+      formData.append("image", imageFile);
     }
-  };
+
+    const { data } = await axios.put(
+      `${base_url}/api/news/${id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${store.token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    console.log("UPDATE RESPONSE:", data);
+
+    toast.success(data?.message || "News updated successfully");
+
+  } catch (error) {
+    console.log("UPDATE ERROR:", error?.response?.data || error.message);
+
+    toast.error(
+      error?.response?.data?.message ||
+      "Update failed"
+    );
+
+  } finally {
+    setLoader(false);
+  }
+};
 
   return (
     <div className="p-5 bg-gray-50 rounded-xl">
@@ -188,10 +196,16 @@ const Edit_news = () => {
               required
             >
               <option value="">Select Category</option>
-              <option value="sports">Sports</option>
-              <option value="politics">Politics</option>
-              <option value="tech">Tech</option>
-              <option value="entertainment">Entertainment</option>
+             <option value="sports">খেলা</option>
+<option value="politics">রাজনীতি</option>
+<option value="tech">প্রযুক্তি</option>
+<option value="international">আন্তর্জাতিক</option>
+<option value="national">জাতীয়</option>
+<option value="country">দেশজুড়ে</option>
+<option value="capital">রাজধানী</option>
+<option value="economy">অর্থনীতি</option>
+<option value="entertainment">বিনোদন</option>
+<option value="lifestyle">লাইফস্টাইল</option>
             </select>
           </div>
 
