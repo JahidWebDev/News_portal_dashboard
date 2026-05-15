@@ -14,7 +14,7 @@ const News = () => {
 
         {store?.userInfo?.role !== "admin" && (
           <Link
-            className="px-3 py-[6px] bg-purple-500 rounded-sm text-white hover:bg-purple-600"
+            className="px-3 py-[6px] bg-black rounded-sm text-white "
             to="/dashboard/news/create"
           >
             Create News

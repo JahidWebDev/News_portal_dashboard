@@ -163,7 +163,7 @@ const Edit_news = () => {
 
         <Link
           to="/dashboard/news"
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm"
+          className="px-4 py-2 bg-black text-white rounded-lg  text-sm"
         >
           Back
         </Link>
@@ -257,7 +257,7 @@ const Edit_news = () => {
           {/* BUTTON */}
           <button
             disabled={loader}
-            className="px-5 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+            className="px-5 py-2 bg-black text-white rounded-lg "
           >
             {loader ? "Loading..." : "Update News"}
           </button>

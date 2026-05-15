@@ -50,7 +50,7 @@ const Profile = () => {
                 type="password"
                 name="old_password"
                 placeholder="Enter old password"
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black-400 outline-none"
               />
             </div>
 
@@ -61,7 +61,7 @@ const Profile = () => {
                 type="password"
                 name="new_password"
                 placeholder="Enter new password"
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2  outline-none"
               />
             </div>
 
@@ -71,7 +71,7 @@ const Profile = () => {
           <div className="mt-6 text-right">
             <button
               type="submit"
-              className="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:opacity-90 transition shadow-md"
+              className="px-6 py-2 bg-gradient-to-r from-red-600 to-black text-white rounded-lg hover:opacity-90 transition shadow-md"
             >
               Update Password
             </button>

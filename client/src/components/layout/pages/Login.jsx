@@ -2,9 +2,10 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import storeContext from "../../../context/storeContext";
 import { base_url } from "../../../config/config";
+import logo from "../../../assets/images/Sobdopoth.png";
 
 const Login = () => {
   const [loader, setLoader] = useState(false);
@@ -43,7 +44,6 @@ const Login = () => {
       toast.success(data?.message || "Login Successful");
 
       if (data?.token) {
-        // Save token + user
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -55,49 +55,46 @@ const Login = () => {
           }
         });
 
-        // 🔥 SAFE ROLE CHECK
         const role = data?.user?.role?.toLowerCase();
 
         setTimeout(() => {
-          if (role === "admin") {
-            navigate("/dashboard/admin");
-          } else if (role === "writer") {
-            navigate("/dashboard/writer");
-          } else {
-            navigate("/dashboard/unable-access");
-          }
+          if (role === "admin") navigate("/dashboard/admin");
+          else if (role === "writer") navigate("/dashboard/writer");
+          else navigate("/dashboard/unable-access");
         }, 800);
       }
 
       setState({ email: "", password: "" });
 
     } catch (error) {
-      console.log("STATUS:", error?.response?.status);
-      console.log("DATA:", error?.response?.data);
-
-      toast.error(
-        error?.response?.data?.message || "Something went wrong"
-      );
+      toast.error(error?.response?.data?.message || "Something went wrong");
     } finally {
       setLoader(false);
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center px-4">
 
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          jonospondon.com
-        </h1>
+      <div className="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-10 border-t-4 border-red-600">
 
-        <form onSubmit={submit} className="space-y-5">
+        {/* Logo */}
+        <div className="flex justify-center mb-10 px-5">
+          <img
+            src={logo}
+            alt="logo"
+            className="w-64 object-contain shadow-lg rounded-lg border border-black/10"
+          />
+        </div>
+
+        <form onSubmit={submit} className="space-y-6">
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-[18px] font-semibold text-gray-700 mb-2">
               Email
             </label>
+
             <input
               name="email"
               onChange={inputHandle}
@@ -105,15 +102,16 @@ const Login = () => {
               required
               type="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-purple-500"
+              className="w-full px-5 py-3 text-lg text-gray-800 placeholder-gray-400 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-[18px] font-semibold text-gray-700 mb-2">
               Password
             </label>
+
             <input
               name="password"
               onChange={inputHandle}
@@ -121,7 +119,7 @@ const Login = () => {
               required
               type="password"
               placeholder="Enter your password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-purple-500"
+              className="w-full px-5 py-3 text-lg text-gray-800 placeholder-gray-400 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition"
             />
           </div>
 
@@ -129,7 +127,7 @@ const Login = () => {
           <button
             disabled={loader}
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-2 rounded-lg hover:opacity-90 transition duration-200"
+            className="w-full bg-gradient-to-r from-red-600 to-black text-white py-4 text-xl font-semibold rounded-xl hover:scale-[1.02] active:scale-95 transition duration-200 shadow-lg"
           >
             {loader ? "Loading..." : "Login"}
           </button>

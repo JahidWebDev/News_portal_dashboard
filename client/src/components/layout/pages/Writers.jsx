@@ -62,7 +62,7 @@ const Writers = () => {
         <h2 className="text-xl font-semibold text-slate-700">Writers</h2>
 
         <Link
-          className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition"
+          className="px-4 py-2 bg-black text-white rounded-md  transition"
           to="/dashboard/writers/add"
         >
           Add Writers

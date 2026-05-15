@@ -15,8 +15,8 @@ import News from "./components/layout/pages/News";
 import Profile from "./components/layout/pages/Profile";
 import CreateNews from "./components/layout/pages/CreateNews";
 import Edit_news from "./components/layout/pages/Edit_news";
+import WriterIndex from "./components/layout/pages/WriterIndex";
 
-import { WriterIndex } from "./components/layout/pages/WriterIndex";
 
 function App() {
   const user = {

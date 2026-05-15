@@ -153,7 +153,7 @@ const CreateNews = () => {
       <div className="flex justify-between p-4">
         <h2 className="text-xl font-medium">Add News</h2>
         <Link
-          className="px-3 py-[6px] bg-purple-500 rounded-sm text-white hover:bg-purple-600"
+          className="px-3 py-[6px] bg-black rounded-sm text-white "
           to="/dashboard/news"
         >
           News
@@ -173,7 +173,7 @@ const CreateNews = () => {
               onChange={(e) => setTitle(e.target.value)}
               type="text"
               placeholder="title"
-              className="px-3 py-2 rounded-md border border-gray-300 focus:border-green-500 outline-none h-10"
+              className="px-3 py-2 rounded-md border border-gray-300  outline-none h-10"
             />
           </div>
 
@@ -184,7 +184,7 @@ const CreateNews = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-              className="px-3 py-2 rounded-md border border-gray-300 focus:border-green-500 outline-none h-10"
+              className="px-3 py-2 rounded-md border border-gray-300  outline-none h-10"
             >
               <option value="">Select Category</option>
 
@@ -246,7 +246,7 @@ const CreateNews = () => {
           {/* Submit */}
           <button
             disabled={loader}
-            className="px-3 py-[6px] bg-purple-500 rounded-sm text-white hover:bg-purple-600"
+            className="px-3 py-[6px] bg-black rounded-sm text-white "
           >
             {loader ? "Loading..." : "Add News"}
           </button>
